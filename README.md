@@ -1,4 +1,4 @@
-# 🎓 Student Data Management System (Web Application)
+# 🎓 Student Data Management System
 
 ## 📌 Project Overview
 
