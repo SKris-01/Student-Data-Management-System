@@ -1,6 +1,6 @@
-# 🎓 Student Data Management System
+# Student Data Management System
 
-## 📌 Project Overview
+## Project Overview
 
 The **Student Data Management System (SDMS)** is a web-based application developed using **.NET MVC** and **Microsoft SQL Server** for backend data storage. The system is designed to manage student information efficiently, allowing **students to register, login, and view their details**, while providing **administrators with the ability to manage and search student records department-wise**.
 
@@ -8,7 +8,7 @@ This project demonstrates the application of **MVC architecture, relational data
 
 ---
 
-## 🎯 Assignment Purpose
+## Purpose of the Project
 
 The project aims to:
 
@@ -22,13 +22,13 @@ This project is suitable for students and professionals who want to learn **full
 
 ---
 
-## 🛠️ Technologies Used
+## Tech Stack Used
 
 | Component | Technology / Tool |
 |-----------|------------------|
 | Web Framework | .NET MVC |
 | Programming Language | C# |
-| Database | Microsoft SQL Server / SQL Server Management Studio (SSMS) |
+| Database | SQL Server Management Studio (SSMS) |
 | Development Environment | Visual Studio 2022 |
 | Authentication & Roles | MVC Identity or Custom Login Logic |
 | Frontend | HTML, CSS, Bootstrap (optional for styling) |
@@ -36,7 +36,7 @@ This project is suitable for students and professionals who want to learn **full
 
 ---
 
-## 📂 Database Design
+## Database Design
 
 The database consists of **two primary tables**:
 
@@ -65,7 +65,7 @@ The database consists of **two primary tables**:
 
 ---
 
-## 🔑 Key Features
+## Key Features
 
 ### Student Module
 - **Signup / Registration**: New students can register by providing personal and academic details.
