@@ -1,0 +1,214 @@
+@{
+    ViewData["Title"] = "Page Not Found";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="error-container">
+                <!-- Animated 404 -->
+                <div class="error-number">
+                    <span class="four">4</span>
+                    <span class="zero">0</span>
+                    <span class="four">4</span>
+                </div>
+                
+                <!-- Error Message -->
+                <div class="error-message mt-4">
+                    <h2 class="h3 text-muted mb-3">Oops! Page Not Found</h2>
+                    <p class="lead text-muted mb-4">
+                        The page you're looking for seems to have wandered off into the digital void.
+                        Don't worry, even the best students sometimes take a wrong turn!
+                    </p>
+                </div>
+
+                <!-- Illustration -->
+                <div class="error-illustration mb-4">
+                    <i class="fas fa-search fa-5x text-primary opacity-50"></i>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="error-actions">
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="javascript:history.back()" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-arrow-left"></i> Go Back
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home"></i> Home Page
+                        </a>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a asp-controller="Student" asp-action="Details" class="btn btn-outline-success btn-lg">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <!-- Helpful Links -->
+                <div class="helpful-links mt-5">
+                    <h5 class="text-muted mb-3">Maybe you were looking for:</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <a asp-controller="Home" asp-action="Index" class="text-decoration-none">
+                                <div class="card border-0 bg-light h-100">
+                                    <div class="card-body text-center py-3">
+                                        <i class="fas fa-home text-primary mb-2"></i>
+                                        <div class="small">Home Page</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <a asp-controller="Account" asp-action="Login" class="text-decoration-none">
+                                    <div class="card border-0 bg-light h-100">
+                                        <div class="card-body text-center py-3">
+                                            <i class="fas fa-sign-in-alt text-success mb-2"></i>
+                                            <div class="small">Student Login</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <a asp-controller="Account" asp-action="Register" class="text-decoration-none">
+                                    <div class="card border-0 bg-light h-100">
+                                        <div class="card-body text-center py-3">
+                                            <i class="fas fa-user-plus text-info mb-2"></i>
+                                            <div class="small">Register</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4 mb-2">
+                                <a asp-controller="Student" asp-action="Details" class="text-decoration-none">
+                                    <div class="card border-0 bg-light h-100">
+                                        <div class="card-body text-center py-3">
+                                            <i class="fas fa-user-graduate text-success mb-2"></i>
+                                            <div class="small">My Dashboard</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="col-md-4 mb-2">
+                                    <a asp-controller="Student" asp-action="Search" class="text-decoration-none">
+                                        <div class="card border-0 bg-light h-100">
+                                            <div class="card-body text-center py-3">
+                                                <i class="fas fa-search text-warning mb-2"></i>
+                                                <div class="small">Search Students</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-container {
+        padding: 2rem 0;
+    }
+
+    .error-number {
+        font-size: 8rem;
+        font-weight: 900;
+        line-height: 1;
+        margin-bottom: 1rem;
+    }
+
+    .error-number span {
+        display: inline-block;
+        animation: bounce 2s infinite;
+    }
+
+    .error-number .four:first-child {
+        color: #007bff;
+        animation-delay: 0s;
+    }
+
+    .error-number .zero {
+        color: #dc3545;
+        animation-delay: 0.2s;
+    }
+
+    .error-number .four:last-child {
+        color: #28a745;
+        animation-delay: 0.4s;
+    }
+
+    @@keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-20px);
+        }
+        60% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .error-illustration {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .helpful-links .card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .helpful-links .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        background-color: #f8f9fa !important;
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    @@media (max-width: 768px) {
+        .error-number {
+            font-size: 5rem;
+        }
+        
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+        
+        .d-flex.gap-3 {
+            flex-direction: column;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-3 .btn {
+            width: 100%;
+        }
+    }
+</style>

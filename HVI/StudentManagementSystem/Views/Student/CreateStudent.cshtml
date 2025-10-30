@@ -1,0 +1,266 @@
+@model StudentManagementSystem.Models.Student
+@{
+    ViewData["Title"] = "Add New Student";
+    var departments = ViewBag.Departments as List<StudentManagementSystem.Models.Department>;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-plus"></i> Add New Student</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Error Messages -->
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <h6><i class="fas fa-exclamation-triangle"></i> Please fix the following errors:</h6>
+                            <ul class="mb-0">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <form asp-action="CreateStudent" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="row">
+                            <!-- Personal Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-user"></i> Personal Information</h6>
+                                
+                                <div class="form-group mb-3">
+                                    <label asp-for="Name" class="form-label">Full Name *</label>
+                                    <input asp-for="Name" class="form-control" placeholder="Enter full name" required />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Username" class="form-label">Username *</label>
+                                    <input asp-for="Username" class="form-control" placeholder="Enter username" required />
+                                    <span asp-validation-for="Username" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Password" class="form-label">Password *</label>
+                                    <input asp-for="Password" type="password" class="form-control" placeholder="Enter password" required />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Role" class="form-label">Role *</label>
+                                    <select asp-for="Role" class="form-control" required>
+                                        <option value="">Select Role</option>
+                                        <option value="Student">Student</option>
+                                        <option value="Admin">Admin</option>
+                                    </select>
+                                    <span asp-validation-for="Role" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="DOB" class="form-label">Date of Birth *</label>
+                                    <input asp-for="DOB" type="date" class="form-control" required />
+                                    <span asp-validation-for="DOB" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Hometown" class="form-label">Hometown *</label>
+                                    <input asp-for="Hometown" class="form-control" placeholder="Enter hometown" required />
+                                    <span asp-validation-for="Hometown" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="PhoneNumber" class="form-label">Phone Number *</label>
+                                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" required />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    <div class="form-text">Enter a valid phone number (e.g., +1234567890)</div>
+                                </div>
+                            </div>
+
+                            <!-- Academic Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-graduation-cap"></i> Academic Information</h6>
+                                
+                                <div class="form-group mb-3">
+                                    <label asp-for="Course" class="form-label">Course *</label>
+                                    <input asp-for="Course" class="form-control" placeholder="e.g., Computer Science Engineering" required />
+                                    <span asp-validation-for="Course" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="DepartmentId" class="form-label">Department *</label>
+                                    <select asp-for="DepartmentId" class="form-control" required>
+                                        <option value="">Select Department</option>
+                                        @if (departments != null)
+                                        {
+                                            @foreach (var dept in departments)
+                                            {
+                                                <option value="@dept.DepartmentId">@dept.DepartmentName</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Semester" class="form-label">Semester *</label>
+                                    <select asp-for="Semester" class="form-control" required>
+                                        <option value="">Select Semester</option>
+                                        @for (int i = 1; i <= 8; i++)
+                                        {
+                                            <option value="@i">Semester @i</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="Semester" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="CGPA" class="form-label">CGPA *</label>
+                                    <input asp-for="CGPA" type="number" step="0.01" min="0" max="4" class="form-control" 
+                                           placeholder="e.g., 3.75" required />
+                                    <span asp-validation-for="CGPA" class="text-danger"></span>
+                                    <div class="form-text">Enter CGPA on a scale of 0.00 to 4.00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="ManageStudents" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to Students
+                                    </a>
+                                    <div>
+                                        <button type="reset" class="btn btn-outline-secondary me-2">
+                                            <i class="fas fa-undo"></i> Reset
+                                        </button>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-save"></i> Create Student
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Real-time validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input, select');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.classList.contains('is-invalid')) {
+                        validateField(this);
+                    }
+                });
+            });
+            
+            function validateField(field) {
+                const value = field.value.trim();
+                const isRequired = field.hasAttribute('required');
+                
+                if (isRequired && !value) {
+                    field.classList.add('is-invalid');
+                    field.classList.remove('is-valid');
+                } else if (value) {
+                    // Additional validation based on field type
+                    let isValid = true;
+                    
+                    if (field.type === 'email') {
+                        const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+                        isValid = emailRegex.test(value);
+                    } else if (field.name === 'CGPA') {
+                        const cgpa = parseFloat(value);
+                        isValid = cgpa >= 0 && cgpa <= 4;
+                    } else if (field.name === 'Username') {
+                        isValid = value.length >= 3;
+                    } else if (field.name === 'Password') {
+                        isValid = value.length >= 6;
+                    } else if (field.name === 'PhoneNumber') {
+                        const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+                        isValid = phoneRegex.test(value);
+                    }
+                    
+                    if (isValid) {
+                        field.classList.add('is-valid');
+                        field.classList.remove('is-invalid');
+                    } else {
+                        field.classList.add('is-invalid');
+                        field.classList.remove('is-valid');
+                    }
+                }
+            }
+            
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                let isFormValid = true;
+                
+                inputs.forEach(input => {
+                    validateField(input);
+                    if (input.classList.contains('is-invalid')) {
+                        isFormValid = false;
+                    }
+                });
+                
+                if (!isFormValid) {
+                    e.preventDefault();
+                    showNotification('Please fix the validation errors before submitting.', 'danger');
+                }
+            });
+        });
+        
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+            `;
+            
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+    </script>
+}

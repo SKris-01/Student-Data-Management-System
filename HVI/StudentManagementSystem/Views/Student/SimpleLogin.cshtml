@@ -1,0 +1,164 @@
+@{
+    ViewData["Title"] = "Admin Login";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4><i class="fas fa-user-shield"></i> Admin Login</h4>
+                </div>
+                <div class="card-body">
+                    <div id="message" class="alert" style="display: none;"></div>
+                    
+                    <form id="loginForm">
+                        <div class="form-group mb-3">
+                            <label for="username" class="form-label">Username:</label>
+                            <input type="text" id="username" class="form-control" value="admin" required>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="password" class="form-label">Password:</label>
+                            <input type="password" id="password" class="form-control" value="Admin123!" required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="createAdmin()">
+                                <i class="fas fa-user-plus"></i> Create Admin User
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="testLogin()">
+                                <i class="fas fa-vial"></i> Test Login
+                            </button>
+                            <button type="button" class="btn btn-warning" onclick="directLogin()">
+                                <i class="fas fa-key"></i> Direct Admin Login
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <strong>Default Credentials:</strong><br>
+                            Username: admin<br>
+                            Password: Admin123!
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    // Try the regular login
+    fetch('/Account/Login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `Username=${encodeURIComponent(username)}&Password=${encodeURIComponent(password)}&RememberMe=false`
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            return response.text();
+        }
+    })
+    .then(html => {
+        if (html && html.includes('Invalid')) {
+            showMessage('Login failed. Trying direct login...', 'warning');
+            directLogin();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Login error. Trying direct login...', 'danger');
+        directLogin();
+    });
+});
+
+function createAdmin() {
+    showMessage('Creating admin user...', 'info');
+    
+    fetch('/Student/CreateAdmin')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('Admin user created successfully!', 'success');
+        } else {
+            showMessage(data.message, 'warning');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error creating admin user', 'danger');
+    });
+}
+
+function testLogin() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    showMessage('Testing login credentials...', 'info');
+    
+    fetch(`/Student/TestLogin?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('Credentials are valid!', 'success');
+        } else {
+            showMessage(`Test failed: ${data.message}`, 'danger');
+        }
+        console.log('Test result:', data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error testing login', 'danger');
+    });
+}
+
+function directLogin() {
+    showMessage('Attempting direct admin login...', 'info');
+    
+    fetch('/Student/AdminLogin')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('Login successful! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = '/Student/AdminDashboard';
+            }, 1000);
+        } else {
+            showMessage(`Direct login failed: ${data.message}`, 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error with direct login', 'danger');
+    });
+}
+
+function showMessage(message, type) {
+    const messageDiv = document.getElementById('message');
+    messageDiv.className = `alert alert-${type}`;
+    messageDiv.textContent = message;
+    messageDiv.style.display = 'block';
+    
+    if (type === 'success') {
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 3000);
+    }
+}
+</script>

@@ -1,0 +1,173 @@
+@model StudentManagementSystem.Models.Student
+@{
+    ViewData["Title"] = "Student Details";
+    var currentUser = ViewBag.CurrentUser as StudentManagementSystem.Models.ApplicationUser;
+}
+
+<div class="container mt-4">
+    <!-- Header with user info -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-user-graduate"></i> Student Dashboard</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                    <i class="fas fa-user"></i> @currentUser?.Name
+                </button>
+                <ul class="dropdown-menu">
+                    <li><span class="dropdown-item-text">Role: @currentUser?.Role</span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form asp-controller="Student" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Student Information Card -->
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-id-card"></i> Personal Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <label class="fw-bold text-muted">Full Name:</label>
+                                <p class="mb-0">@Model.Name</p>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="fw-bold text-muted">Username:</label>
+                                <p class="mb-0">@Model.Username</p>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="fw-bold text-muted">Role:</label>
+                                <span class="badge bg-primary">@Model.Role</span>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="fw-bold text-muted">Course:</label>
+                                <p class="mb-0">@Model.Course</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <label class="fw-bold text-muted">Department:</label>
+                                <p class="mb-0">@Model.Department.DepartmentName</p>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="fw-bold text-muted">Semester:</label>
+                                <p class="mb-0">@Model.Semester</p>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="fw-bold text-muted">CGPA:</label>
+                                <p class="mb-0">
+                                    <span class="badge @(Model.CGPA >= 3.5m ? "bg-success" : Model.CGPA >= 3.0m ? "bg-warning" : "bg-danger")">
+                                        @Model.CGPA.ToString("F2")
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="fw-bold text-muted">Date of Birth:</label>
+                                <p class="mb-0">@Model.DOB.ToString("dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="fw-bold text-muted">Hometown:</label>
+                                <p class="mb-0">@Model.Hometown</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="fw-bold text-muted">Phone Number:</label>
+                                <p class="mb-0">
+                                    <i class="fas fa-phone text-success"></i> @Model.PhoneNumber
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Search Panel -->
+        <div class="col-md-4">
+            @if (currentUser?.Role == "Admin")
+            {
+                <div class="card shadow">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-search"></i> Admin Search</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-controller="Student" asp-action="Search" method="get">
+                            <div class="form-group mb-3">
+                                <label for="departmentName" class="form-label">Search by Department:</label>
+                                <input type="text" name="departmentName" class="form-control" 
+                                       placeholder="Enter department name" />
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100">
+                                <i class="fas fa-search"></i> Search Students
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow mt-3">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0"><i class="fas fa-info-circle"></i> Admin Features</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="small mb-2">As an admin, you can:</p>
+                        <ul class="small mb-0">
+                            <li>Search students by department</li>
+                            <li>View all student records</li>
+                            <li>Access administrative functions</li>
+                        </ul>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="fas fa-chart-line"></i> Academic Progress</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="progress mb-3" style="height: 20px;">
+                            @{
+                                var progressPercentage = (Model.Semester / 8.0) * 100;
+                            }
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 style="width: @progressPercentage%">
+                                Semester @Model.Semester of 8
+                            </div>
+                        </div>
+                        <p class="small text-muted">Academic Progress: @progressPercentage.ToString("F0")% Complete</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-item label {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    .info-item p {
+        font-size: 1rem;
+        color: #333;
+    }
+</style>

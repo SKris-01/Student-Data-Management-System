@@ -1,0 +1,564 @@
+@model List<StudentManagementSystem.Models.Student>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var currentUser = ViewBag.CurrentUser as StudentManagementSystem.Models.ApplicationUser;
+    var departments = ViewBag.Departments as List<StudentManagementSystem.Models.Department>;
+}
+
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+            <p class="text-muted">Comprehensive student management and analytics</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                    <i class="fas fa-user-shield"></i> @currentUser?.Name
+                </button>
+                <ul class="dropdown-menu">
+                    <li><span class="dropdown-item-text">Role: @currentUser?.Role</span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" asp-action="Details">
+                        <i class="fas fa-user"></i> My Profile
+                    </a></li>
+                    <li>
+                        <form asp-controller="Student" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions & Search Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions & Search</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Quick Action Buttons -->
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-primary mb-3">Quick Actions</h6>
+                            <div class="d-grid gap-2">
+                                <a asp-action="CreateStudent" class="btn btn-success">
+                                    <i class="fas fa-user-plus"></i> Add New Student
+                                </a>
+                                <a asp-action="ManageStudents" class="btn btn-primary">
+                                    <i class="fas fa-users-cog"></i> Manage All Students
+                                </a>
+                                <button type="button" class="btn btn-info" onclick="refreshDashboard()">
+                                    <i class="fas fa-sync-alt"></i> Refresh Data
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Search -->
+                        <div class="col-md-8 mb-3">
+                            <h6 class="text-primary mb-3">Quick Search & Filter</h6>
+                            <form method="get" asp-action="ManageStudents" class="row g-2">
+                                <div class="col-md-4">
+                                    <input type="text" name="searchTerm" class="form-control" placeholder="Search by name, username..." />
+                                </div>
+                                <div class="col-md-3">
+                                    <select name="departmentId" class="form-control">
+                                        <option value="">All Departments</option>
+                                        @if (departments != null)
+                                        {
+                                            @foreach (var dept in departments)
+                                            {
+                                                <option value="@dept.DepartmentId">@dept.DepartmentName</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select name="semester" class="form-control">
+                                        <option value="">All Semesters</option>
+                                        @for (int i = 1; i <= 8; i++)
+                                        {
+                                            <option value="@i">Sem @i</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="minCgpa" class="form-control" placeholder="Min CGPA" step="0.1" min="0" max="4" />
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">@Model.Count</h4>
+                            <p class="mb-0">Total Students</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">@(departments?.Count ?? 0)</h4>
+                            <p class="mb-0">Departments</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-building fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">@Model.Where(s => s.CGPA >= 3.5m).Count()</h4>
+                            <p class="mb-0">High Achievers</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-trophy fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">@Model.Where(s => s.Role == "Admin").Count()</h4>
+                            <p class="mb-0">Administrators</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-shield fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Advanced Search Panel -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-search-plus"></i> Advanced Search</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Search" method="get">
+                        <div class="form-group mb-3">
+                            <label for="departmentName" class="form-label">Department:</label>
+                            <select name="departmentName" class="form-control">
+                                <option value="">All Departments</option>
+                                @if (departments != null)
+                                {
+                                    @foreach (var dept in departments)
+                                    {
+                                        <option value="@dept.DepartmentName">@dept.DepartmentName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="minCGPA" class="form-label">Minimum CGPA:</label>
+                            <input type="number" name="minCGPA" class="form-control" step="0.1" min="0" max="4" placeholder="e.g., 3.0" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="semester" class="form-label">Semester:</label>
+                            <select name="semester" class="form-control">
+                                <option value="">All Semesters</option>
+                                @for (int i = 1; i <= 8; i++)
+                                {
+                                    <option value="@i">Semester @i</option>
+                                }
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Search Students
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="CreateStudent" class="btn btn-success btn-sm">
+                            <i class="fas fa-user-plus"></i> Add New Student
+                        </a>
+                        <a asp-action="ManageStudents" class="btn btn-primary btn-sm">
+                            <i class="fas fa-users-cog"></i> Manage All Students
+                        </a>
+                        <a asp-action="Search" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-search"></i> Advanced Search
+                        </a>
+                        <button type="button" class="btn btn-outline-warning btn-sm" onclick="refreshDashboard()">
+                            <i class="fas fa-sync-alt"></i> Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Overview -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Department Overview</h5>
+                </div>
+                <div class="card-body">
+                    @if (departments != null && departments.Any())
+                    {
+                        <div class="row">
+                            @foreach (var dept in departments)
+                            {
+                                var deptStudents = Model.Where(s => s.DepartmentId == dept.DepartmentId).ToList();
+                                var avgCGPA = deptStudents.Any() ? deptStudents.Average(s => (double)s.CGPA) : 0;
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-left-primary">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary">@dept.DepartmentName</h6>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <small class="text-muted">Students:</small>
+                                                    <div class="h5 mb-0">@deptStudents.Count</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <small class="text-muted">Avg CGPA:</small>
+                                                    <div class="h5 mb-0 @(avgCGPA >= 3.5 ? "text-success" : avgCGPA >= 3.0 ? "text-warning" : "text-danger")">
+                                                        @avgCGPA.ToString("F2")
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="progress mt-2" style="height: 5px;">
+                                                <div class="progress-bar bg-primary" style="width: @((deptStudents.Count / (double)Model.Count) * 100)%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Students Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-table"></i> All Students (@Model.Count total)</h5>
+                    <div class="btn-group btn-group-sm">
+                        <a asp-action="ManageStudents" class="btn btn-outline-light">
+                            <i class="fas fa-list"></i> View All
+                        </a>
+                        <a asp-action="CreateStudent" class="btn btn-outline-light">
+                            <i class="fas fa-plus"></i> Add New
+                        </a>
+                        <button type="button" class="btn btn-outline-light" onclick="exportStudents()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th><i class="fas fa-id-badge"></i> ID</th>
+                                        <th><i class="fas fa-user"></i> Name</th>
+                                        <th><i class="fas fa-at"></i> Username</th>
+                                        <th><i class="fas fa-graduation-cap"></i> Course</th>
+                                        <th><i class="fas fa-building"></i> Department</th>
+                                        <th><i class="fas fa-calendar"></i> Semester</th>
+                                        <th><i class="fas fa-chart-line"></i> CGPA</th>
+                                        <th><i class="fas fa-map-marker-alt"></i> Hometown</th>
+                                        <th><i class="fas fa-cogs"></i> Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var student in Model.Take(20))
+                                    {
+                                        <tr>
+                                            <td>@student.Id</td>
+                                            <td>
+                                                <strong>@student.Name</strong>
+                                                @if (student.Role == "Admin")
+                                                {
+                                                    <span class="badge bg-warning text-dark ms-1">Admin</span>
+                                                }
+                                            </td>
+                                            <td>@student.Username</td>
+                                            <td>@student.Course</td>
+                                            <td>
+                                                <span class="badge bg-secondary">@student.Department.DepartmentName</span>
+                                            </td>
+                                            <td>@student.Semester</td>
+                                            <td>
+                                                <span class="badge @(student.CGPA >= 3.5m ? "bg-success" : student.CGPA >= 3.0m ? "bg-warning text-dark" : "bg-danger")">
+                                                    @student.CGPA.ToString("F2")
+                                                </span>
+                                            </td>
+                                            <td>@student.Hometown</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a asp-action="ViewStudent" asp-route-id="@student.Id"
+                                                       class="btn btn-outline-primary btn-sm" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="EditStudent" asp-route-id="@student.Id"
+                                                       class="btn btn-outline-warning btn-sm" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (Model.Count > 20)
+                        {
+                            <div class="text-center mt-3">
+                                <p class="text-muted">Showing 20 of @Model.Count students</p>
+                                <div class="btn-group">
+                                    <a asp-action="ManageStudents" class="btn btn-primary">
+                                        <i class="fas fa-list"></i> View All Students
+                                    </a>
+                                    <a asp-action="CreateStudent" class="btn btn-success">
+                                        <i class="fas fa-plus"></i> Add New Student
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Students Found</h4>
+                            <p class="text-muted">No students are currently registered in the system.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-left-primary {
+        border-left: 4px solid #007bff !important;
+    }
+
+    .card-body .progress {
+        height: 5px;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+</style>
+
+<script>
+function refreshDashboard() {
+    // Show loading state
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+    refreshBtn.disabled = true;
+
+    // Reload the page to get fresh data
+    setTimeout(() => {
+        window.location.reload();
+    }, 1000);
+}
+
+// Auto-refresh every 5 minutes for real-time data
+setInterval(() => {
+    // Only auto-refresh if user is still active (not idle)
+    if (document.hasFocus()) {
+        console.log('Auto-refreshing dashboard data...');
+        // You could implement AJAX refresh here instead of full page reload
+        // For now, we'll just log it
+    }
+}, 300000); // 5 minutes
+
+// Real-time data update notification
+document.addEventListener('DOMContentLoaded', function() {
+    // Show notification that data is live
+    setTimeout(() => {
+        showNotification('Dashboard loaded with real-time data from SQL Server', 'success');
+    }, 1000);
+});
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = `
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+    `;
+
+    notification.innerHTML = `
+        <i class="fas fa-info-circle"></i> ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 4000);
+}
+</script>
+
+<script>
+function refreshDashboard() {
+    // Show loading state
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+    refreshBtn.disabled = true;
+
+    // Reload the page to get fresh data
+    setTimeout(() => {
+        window.location.reload();
+    }, 1000);
+}
+
+// Export students function
+function exportStudents() {
+    // Create CSV content
+    let csvContent = "ID,Name,Username,Course,Department,Semester,CGPA,Hometown,Role\n";
+
+    // Get table data
+    const table = document.querySelector('table tbody');
+    const rows = table.querySelectorAll('tr');
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length > 0) {
+            const rowData = [
+                cells[0].textContent.trim(), // ID
+                cells[1].textContent.replace(/\s+/g, ' ').trim(), // Name (clean up whitespace)
+                cells[2].textContent.trim(), // Username
+                cells[3].textContent.trim(), // Course
+                cells[4].textContent.trim(), // Department
+                cells[5].textContent.trim(), // Semester
+                cells[6].textContent.trim(), // CGPA
+                cells[7].textContent.trim(), // Hometown
+                cells[1].textContent.includes('Admin') ? 'Admin' : 'Student' // Role
+            ];
+            csvContent += rowData.map(field => `"${field}"`).join(',') + '\n';
+        }
+    });
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `students_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Show success message
+    showNotification('Student data exported successfully!', 'success');
+}
+
+// Show notification function
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = `
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+    `;
+
+    notification.innerHTML = `
+        <i class="fas fa-info-circle"></i> ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 4000);
+}
+
+// Auto-refresh every 5 minutes
+setInterval(() => {
+    console.log('Auto-refreshing dashboard data...');
+    // You could implement AJAX refresh here instead of full page reload
+}, 300000); // 5 minutes
+
+// Real-time data update notification
+document.addEventListener('DOMContentLoaded', function() {
+    // Show last updated time
+    const lastUpdated = new Date().toLocaleString();
+    const updateInfo = document.createElement('small');
+    updateInfo.className = 'text-muted';
+    updateInfo.innerHTML = `<i class="fas fa-clock"></i> Last updated: ${lastUpdated}`;
+
+    const header = document.querySelector('h2');
+    if (header) {
+        header.parentNode.appendChild(updateInfo);
+    }
+});
+</script>

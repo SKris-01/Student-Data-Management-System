@@ -1,0 +1,269 @@
+@model StudentManagementSystem.Models.Student
+@{
+    ViewData["Title"] = "Student Details";
+    var currentUser = ViewBag.CurrentUser as StudentManagementSystem.Models.ApplicationUser;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-user-graduate"></i> Student Details</h2>
+                    <p class="text-muted">Complete information for @Model.Name</p>
+                </div>
+                <div>
+                    <a asp-action="ManageStudents" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Students
+                    </a>
+                    <a asp-action="EditStudent" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit Student
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Personal Information Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-user"></i> Personal Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Student ID:</strong></div>
+                                <div class="col-sm-8">
+                                    <span class="badge bg-primary">#@Model.Id</span>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Full Name:</strong></div>
+                                <div class="col-sm-8">@Model.Name</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Username:</strong></div>
+                                <div class="col-sm-8">
+                                    <code>@Model.Username</code>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Role:</strong></div>
+                                <div class="col-sm-8">
+                                    <span class="badge @(Model.Role == "Admin" ? "bg-warning text-dark" : "bg-info")">
+                                        @Model.Role
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Date of Birth:</strong></div>
+                                <div class="col-sm-8">
+                                    @Model.DOB.ToString("MMMM dd, yyyy")
+                                    <small class="text-muted">
+                                        (Age: @((DateTime.Now - Model.DOB).Days / 365) years)
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Hometown:</strong></div>
+                                <div class="col-sm-8">
+                                    <i class="fas fa-map-marker-alt text-danger"></i> @Model.Hometown
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Phone Number:</strong></div>
+                                <div class="col-sm-8">
+                                    <i class="fas fa-phone text-success"></i> @Model.PhoneNumber
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Information Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> Academic Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Course:</strong></div>
+                                <div class="col-sm-8">@Model.Course</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Department:</strong></div>
+                                <div class="col-sm-8">
+                                    <span class="badge bg-secondary">@Model.Department.DepartmentName</span>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Semester:</strong></div>
+                                <div class="col-sm-8">
+                                    <span class="badge bg-info">Semester @Model.Semester</span>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>CGPA:</strong></div>
+                                <div class="col-sm-8">
+                                    <span class="badge @(Model.CGPA >= 3.5m ? "bg-success" : Model.CGPA >= 3.0m ? "bg-warning text-dark" : "bg-danger") fs-6">
+                                        @Model.CGPA.ToString("F2") / 4.00
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- CGPA Progress Bar -->
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Performance:</strong></div>
+                                <div class="col-sm-8">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar @(Model.CGPA >= 3.5m ? "bg-success" : Model.CGPA >= 3.0m ? "bg-warning" : "bg-danger")" 
+                                             role="progressbar" 
+                                             style="width: @((Model.CGPA / 4.0m) * 100)%"
+                                             aria-valuenow="@Model.CGPA" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="4">
+                                            @Model.CGPA.ToString("F2")
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        @if (Model.CGPA >= 3.5m)
+                                        {
+                                            <span class="text-success">Excellent Performance</span>
+                                        }
+                                        else if (Model.CGPA >= 3.0m)
+                                        {
+                                            <span class="text-warning">Good Performance</span>
+                                        }
+                                        else if (Model.CGPA >= 2.5m)
+                                        {
+                                            <span class="text-info">Average Performance</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">Needs Improvement</span>
+                                        }
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics and Actions Row -->
+            <div class="row">
+                <!-- Quick Stats -->
+                <div class="col-md-8 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Quick Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3 mb-3">
+                                    <div class="border-end">
+                                        <h4 class="text-primary">@Model.Semester</h4>
+                                        <small class="text-muted">Current Semester</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="border-end">
+                                        <h4 class="text-success">@Model.CGPA.ToString("F2")</h4>
+                                        <small class="text-muted">CGPA</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="border-end">
+                                        <h4 class="text-info">@((DateTime.Now - Model.DOB).Days / 365)</h4>
+                                        <small class="text-muted">Age (Years)</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <h4 class="text-warning">@((8 - Model.Semester))</h4>
+                                    <small class="text-muted">Semesters Left</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0"><i class="fas fa-cogs"></i> Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a asp-action="EditStudent" asp-route-id="@Model.Id" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Edit Student
+                                </a>
+                                <button type="button" class="btn btn-danger" onclick="confirmDelete(@Model.Id, '@Model.Name')">
+                                    <i class="fas fa-trash"></i> Delete Student
+                                </button>
+                                <a asp-action="ManageStudents" class="btn btn-outline-secondary">
+                                    <i class="fas fa-list"></i> All Students
+                                </a>
+                                <button type="button" class="btn btn-outline-info" onclick="printStudent()">
+                                    <i class="fas fa-print"></i> Print Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete student <strong id="studentName"></strong>?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Student
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(studentId, studentName) {
+    document.getElementById('studentName').textContent = studentName;
+    document.getElementById('deleteForm').action = '@Url.Action("DeleteStudent")/' + studentId;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+
+function printStudent() {
+    window.print();
+}
+
+// Print styles
+const printStyles = `
+    @@media print {
+        .btn, .modal, .card-header { display: none !important; }
+        .card { border: 1px solid #000 !important; box-shadow: none !important; }
+        .container { max-width: 100% !important; }
+    }
+`;
+
+const styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = printStyles;
+document.head.appendChild(styleSheet);
+</script>
