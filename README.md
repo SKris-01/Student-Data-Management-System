@@ -31,7 +31,7 @@ This project is suitable for students and professionals who want to learn **full
 | Database | SQL Server Management Studio (SSMS) |
 | Development Environment | Visual Studio 2022 |
 | Authentication & Roles | MVC Identity or Custom Login Logic |
-| Frontend | HTML, CSS, Bootstrap (optional for styling) |
+| Frontend | Bootstrap |
 | ORM / Data Access | Entity Framework or ADO.NET |
 
 ---
